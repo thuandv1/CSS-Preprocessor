@@ -1,0 +1,134 @@
+//----------------------- Variables-----------------------------
+$total-cols: 12;
+
+$breakpoints: (
+    lg: 1200px,
+    md: 980px,
+    sm: 768px,
+    xs: 540px,
+);
+
+%d-flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+// CSS
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.grid-full {
+    width: 100%;
+    padding: 0;
+    transition: 0.3s linear;
+}
+
+.grid {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    transition: 0.3s linear;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+// ---------------------------------mixin-------------------------
+// Media query mixin
+@mixin responsive($breakpoint) {
+    //check exits breakpoins
+    @if map-has-key($breakpoints, $breakpoint) {
+        // get breakpoint value
+        $breakpoint-value: map-get($breakpoints, $breakpoint);
+        // create mediascreen
+        @media (max-width: ($breakpoint-value - 0.02px)) {
+            @content;
+        }
+        //if breakpoint not exits
+    } @else {
+        @warn "Invalid breakpoint:  #{$breakpoint}. ";
+    }
+}
+
+// mixin resize grid
+@mixin grid-width($min-width: 740px, $max-width: 1023px, $grid-width: 644px) {
+    @media (min-width: $min-width) and (max-width: $max-width) {
+        .grid {
+            width: $grid-width;
+        }
+    }
+}
+
+// mixin row and col
+@mixin row($margin-left: 12px, $margin-right: 12px) {
+    .row {
+        margin-left: $margin-left;
+        margin-right: $margin-right;
+    }
+}
+
+@mixin col($padding-left: 12px, $padding-right: 12px, $margin-top: 12px, $margin-bottom: 12px) {
+    .col {
+        padding-left: $padding-left;
+        padding-right: $padding-right;
+        margin-top: $margin-top;
+        margin-bottom: $margin-bottom;
+    }
+}
+
+// Create col
+@function colum-width($col) {
+    @return percentage($col/$total-cols);
+}
+
+@mixin cols-screen($breakpoint: desktop) {
+    @for $i from 1 through $total-cols {
+        //check exits breakpoins
+        @if map-has-key($breakpoints, $breakpoint) {
+            .col-#{$breakpoint}-#{$i} {
+                flex: 0 0 colum-width($i);
+                max-width: colum-width($i);
+            }
+        } @else {
+            .col-#{$i} {
+                flex: 0 0 colum-width($i);
+                max-width: colum-width($i);
+            }
+        }
+    }
+}
+
+// use mixin
+@include col();
+@include row(-12px, -12px);
+@include cols-screen();
+
+@include responsive(lg) {
+    @include cols-screen(lg);
+}
+
+@include responsive(md) {
+    @include row(-5px, -5px);
+    @include col(5px, 5px);
+    @include cols-screen(md);
+}
+
+@include responsive(sm) {
+    @include row(0, 0);
+    @include col(10px, 10px);
+    @include cols-screen(sm);
+}
+
+@include responsive(xs) {
+    @include row(0, 0);
+    @include col(10px 10px);
+    @include cols-screen(xs);
+}
+
+@include grid-width();
+@include grid-width(1024px, 1239px, 984px);
